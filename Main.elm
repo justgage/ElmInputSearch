@@ -136,16 +136,28 @@ update msg model =
         UpdateForm form value ->
             case form of
                 EmployeesName ->
-                    ( { model
-                        | employeesName = value
-                        , employeeSuggestion =
-                            if value == "" then
-                                Nothing
-                            else
-                                model.employees
-                                    |> employeeFilter value
-                                    |> List.head
-                      }
+                    ( model
+                        |> updateSearchBox value
+                        |> updateDropDown
+                            (let
+                                numberOfSuggestions =
+                                    model.employees
+                                        |> employeeFilter value
+                                        |> List.length
+
+                                suggestedName =
+                                    case model.employeeSuggestion of
+                                        Just e ->
+                                            e.name
+
+                                        Nothing ->
+                                            ""
+
+                                exactMatch =
+                                    model.employeesName == suggestedName
+                             in
+                                numberOfSuggestions > 1 && exactMatch
+                            )
                     , Cmd.none
                     )
 
@@ -156,26 +168,43 @@ update msg model =
                     ( { model | customerName = value }, Cmd.none )
 
         DropDown open ->
-            if open then
-                ( { model | employeesNameFocused = True }, Cmd.none )
-            else
-                case model.employeeSuggestion of
-                    Just employee ->
-                        ( { model | employeesNameFocused = False, employeesName = employee.name }, Cmd.none )
-
-                    Nothing ->
-                        ( { model | employeesNameFocused = False }, Cmd.none )
+            ( model
+                |> updateDropDown open
+                |> updateTakeSuggestion
+            , Cmd.none
+            )
 
         SuggestEmployee employee ->
             ( { model | employeeSuggestion = employee }, Cmd.none )
 
         TakeSuggestion ->
-            case model.employeeSuggestion of
-                Just { name } ->
-                    ( { model | employeesName = name }, Cmd.none )
+            ( updateTakeSuggestion model, Cmd.none )
 
-                Nothing ->
-                    ( model, Cmd.none )
+
+updateSearchBox value model =
+    { model
+        | employeesName = value
+        , employeeSuggestion =
+            if value == "" then
+                Nothing
+            else
+                model.employees
+                    |> employeeFilter value
+                    |> List.head
+    }
+
+
+updateDropDown open model =
+    { model | employeesNameFocused = open }
+
+
+updateTakeSuggestion model =
+    case model.employeeSuggestion of
+        Just { name } ->
+            { model | employeesName = name }
+
+        Nothing ->
+            model
 
 
 

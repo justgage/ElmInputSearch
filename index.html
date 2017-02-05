@@ -9391,26 +9391,62 @@ var _thereisno$repository$Main$dropdownStyle = _elm_lang$html$Html_Attributes$st
 			_1: {ctor: '[]'}
 		}
 	});
+var _thereisno$repository$Main$updateTakeSuggestion = function (model) {
+	var _p0 = model.employeeSuggestion;
+	if (_p0.ctor === 'Just') {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{employeesName: _p0._0.name});
+	} else {
+		return model;
+	}
+};
+var _thereisno$repository$Main$updateDropDown = F2(
+	function (open, model) {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{employeesNameFocused: open});
+	});
+var _thereisno$repository$Main$updateSearchBox = F2(
+	function (value, model) {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				employeesName: value,
+				employeeSuggestion: _elm_lang$core$Native_Utils.eq(value, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$List$head(
+					A2(_thereisno$repository$Main$employeeFilter, value, model.employees))
+			});
+	});
 var _thereisno$repository$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'UpdateForm':
-				var _p2 = _p0._1;
-				var _p1 = _p0._0;
-				switch (_p1.ctor) {
+				var _p4 = _p1._1;
+				var _p2 = _p1._0;
+				switch (_p2.ctor) {
 					case 'EmployeesName':
 						return {
 							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{
-									employeesName: _p2,
-									employeeSuggestion: _elm_lang$core$Native_Utils.eq(_p2, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$List$head(
-										A2(_thereisno$repository$Main$employeeFilter, _p2, model.employees))
-								}),
+							_0: A2(
+								_thereisno$repository$Main$updateDropDown,
+								function () {
+									var suggestedName = function () {
+										var _p3 = model.employeeSuggestion;
+										if (_p3.ctor === 'Just') {
+											return _p3._0.name;
+										} else {
+											return '';
+										}
+									}();
+									var exactMatch = _elm_lang$core$Native_Utils.eq(model.employeesName, suggestedName);
+									var numberOfSuggestions = _elm_lang$core$List$length(
+										A2(_thereisno$repository$Main$employeeFilter, _p4, model.employees));
+									return (_elm_lang$core$Native_Utils.cmp(numberOfSuggestions, 1) > 0) && exactMatch;
+								}(),
+								A2(_thereisno$repository$Main$updateSearchBox, _p4, model)),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'CostomersPhoneOrEmail':
@@ -9418,7 +9454,7 @@ var _thereisno$repository$Main$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{customerEmailOrPhone: _p2}),
+								{customerEmailOrPhone: _p4}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					default:
@@ -9426,60 +9462,31 @@ var _thereisno$repository$Main$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{customerName: _p2}),
+								{customerName: _p4}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 				}
 			case 'DropDown':
-				if (_p0._0) {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{employeesNameFocused: true}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					var _p3 = model.employeeSuggestion;
-					if (_p3.ctor === 'Just') {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{employeesNameFocused: false, employeesName: _p3._0.name}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{employeesNameFocused: false}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-				}
+				return {
+					ctor: '_Tuple2',
+					_0: _thereisno$repository$Main$updateTakeSuggestion(
+						A2(_thereisno$repository$Main$updateDropDown, _p1._0, model)),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'SuggestEmployee':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{employeeSuggestion: _p0._0}),
+						{employeeSuggestion: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				var _p4 = model.employeeSuggestion;
-				if (_p4.ctor === 'Just') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{employeesName: _p4._0.name}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
+				return {
+					ctor: '_Tuple2',
+					_0: _thereisno$repository$Main$updateTakeSuggestion(model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _thereisno$repository$Main$Model = F7(
