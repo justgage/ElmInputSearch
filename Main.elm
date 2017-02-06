@@ -167,13 +167,15 @@ update msg model =
             ( { model | employeeSuggestion = (findNextSuggestion model) }, Cmd.none )
 
         PreviousSuggestion ->
-            ( model, Cmd.none )
+            ( { model | employeeSuggestion = (findPreviousSuggestion model) }, Cmd.none )
 
 
 findNextSuggestion { employeeSuggestion, employees, employeesName } =
     case employeeSuggestion of
         Nothing ->
-            List.head employees
+            employees
+            |> employeeFilter employeesName
+            |> List.head
 
         Just currentSuggestion ->
             let
@@ -185,7 +187,33 @@ findNextSuggestion { employeeSuggestion, employees, employeesName } =
             in
                 case nextEmployee of
                     Nothing ->
-                        List.head employees
+                        employees
+                        |> employeeFilter employeesName
+                        |> List.head
+
+                    Just e ->
+                        Just e
+
+findPreviousSuggestion { employeeSuggestion, employees, employeesName } =
+    case employeeSuggestion of
+        Nothing ->
+            employees
+            |> employeeFilter employeesName
+            |> List.Extra.last
+
+        Just currentSuggestion ->
+            let
+                nextEmployee =
+                    employees
+                        |> employeeFilter employeesName
+                        |> List.Extra.takeWhile (\e -> currentSuggestion /= e)
+                        |> List.Extra.last
+            in
+                case nextEmployee of
+                    Nothing ->
+                        employees
+                        |> employeeFilter employeesName
+                        |> List.Extra.last
 
                     Just e ->
                         Just e
@@ -335,10 +363,18 @@ handleKeyPress keyCode =
         Key.Down ->
             NextSuggestion
 
+        Key.Up ->
+            PreviousSuggestion
         _ ->
             NoOp
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Keyboard.downs handleKeyPress
+    if model.employeesNameFocused then
+        Keyboard.downs handleKeyPress
+    else 
+        Sub.none
+    
+
+
