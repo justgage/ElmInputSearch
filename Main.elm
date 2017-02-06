@@ -5,6 +5,7 @@ import Html.Attributes as Attr
 import Html.Events exposing (..)
 import Keyboard.Key as Key
 import Keyboard
+import List.Extra
 
 
 main : Program Never Model Msg
@@ -50,6 +51,8 @@ type Msg
     | DropDown Bool
     | SuggestEmployee (Maybe Employee)
     | TakeSuggestion
+    | NextSuggestion
+    | PreviousSuggestion
 
 
 
@@ -138,26 +141,6 @@ update msg model =
                 EmployeesName ->
                     ( model
                         |> updateSearchBox value
-                        |> updateDropDown
-                            (let
-                                numberOfSuggestions =
-                                    model.employees
-                                        |> employeeFilter value
-                                        |> List.length
-
-                                suggestedName =
-                                    case model.employeeSuggestion of
-                                        Just e ->
-                                            e.name
-
-                                        Nothing ->
-                                            ""
-
-                                exactMatch =
-                                    model.employeesName == suggestedName
-                             in
-                                numberOfSuggestions > 1 && exactMatch
-                            )
                     , Cmd.none
                     )
 
@@ -179,6 +162,33 @@ update msg model =
 
         TakeSuggestion ->
             ( updateTakeSuggestion model, Cmd.none )
+
+        NextSuggestion ->
+            ( { model | employeeSuggestion = (findNextSuggestion model) }, Cmd.none )
+
+        PreviousSuggestion ->
+            ( model, Cmd.none )
+
+
+findNextSuggestion { employeeSuggestion, employees, employeesName } =
+    case employeeSuggestion of
+        Nothing ->
+            List.head employees
+
+        Just currentSuggestion ->
+            let
+                nextEmployee =
+                    employees
+                        |> employeeFilter employeesName
+                        |> List.Extra.dropWhile (\e -> currentSuggestion /= e)
+                        |> List.Extra.getAt 1
+            in
+                case nextEmployee of
+                    Nothing ->
+                        List.head employees
+
+                    Just e ->
+                        Just e
 
 
 updateSearchBox value model =
@@ -321,6 +331,9 @@ handleKeyPress keyCode =
     case (Key.fromCode keyCode) of
         Key.Enter ->
             TakeSuggestion
+
+        Key.Down ->
+            NextSuggestion
 
         _ ->
             NoOp
