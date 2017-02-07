@@ -10745,12 +10745,39 @@ var _thereisno$repository$Main$updateSearchBox = F2(
 					A2(_thereisno$repository$Main$employeeFilter, value, model.employees))
 			});
 	});
-var _thereisno$repository$Main$findNextSuggestion = function (_p1) {
+var _thereisno$repository$Main$findPreviousSuggestion = function (_p1) {
 	var _p2 = _p1;
+	var _p6 = _p2.employeesName;
 	var _p5 = _p2.employees;
 	var _p3 = _p2.employeeSuggestion;
 	if (_p3.ctor === 'Nothing') {
-		return _elm_lang$core$List$head(_p5);
+		return _elm_community$list_extra$List_Extra$last(
+			A2(_thereisno$repository$Main$employeeFilter, _p6, _p5));
+	} else {
+		var nextEmployee = _elm_community$list_extra$List_Extra$last(
+			A2(
+				_elm_community$list_extra$List_Extra$takeWhile,
+				function (e) {
+					return !_elm_lang$core$Native_Utils.eq(_p3._0, e);
+				},
+				A2(_thereisno$repository$Main$employeeFilter, _p6, _p5)));
+		var _p4 = nextEmployee;
+		if (_p4.ctor === 'Nothing') {
+			return _elm_community$list_extra$List_Extra$last(
+				A2(_thereisno$repository$Main$employeeFilter, _p6, _p5));
+		} else {
+			return _elm_lang$core$Maybe$Just(_p4._0);
+		}
+	}
+};
+var _thereisno$repository$Main$findNextSuggestion = function (_p7) {
+	var _p8 = _p7;
+	var _p12 = _p8.employeesName;
+	var _p11 = _p8.employees;
+	var _p9 = _p8.employeeSuggestion;
+	if (_p9.ctor === 'Nothing') {
+		return _elm_lang$core$List$head(
+			A2(_thereisno$repository$Main$employeeFilter, _p12, _p11));
 	} else {
 		var nextEmployee = A2(
 			_elm_community$list_extra$List_Extra$getAt,
@@ -10758,31 +10785,35 @@ var _thereisno$repository$Main$findNextSuggestion = function (_p1) {
 			A2(
 				_elm_community$list_extra$List_Extra$dropWhile,
 				function (e) {
-					return !_elm_lang$core$Native_Utils.eq(_p3._0, e);
+					return !_elm_lang$core$Native_Utils.eq(_p9._0, e);
 				},
-				A2(_thereisno$repository$Main$employeeFilter, _p2.employeesName, _p5)));
-		var _p4 = nextEmployee;
-		if (_p4.ctor === 'Nothing') {
-			return _elm_lang$core$List$head(_p5);
+				A2(_thereisno$repository$Main$employeeFilter, _p12, _p11)));
+		var _p10 = nextEmployee;
+		if (_p10.ctor === 'Nothing') {
+			return _elm_lang$core$List$head(
+				A2(_thereisno$repository$Main$employeeFilter, _p12, _p11));
 		} else {
-			return _elm_lang$core$Maybe$Just(_p4._0);
+			return _elm_lang$core$Maybe$Just(_p10._0);
 		}
 	}
 };
 var _thereisno$repository$Main$update = F2(
 	function (msg, model) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
+		var _p13 = msg;
+		switch (_p13.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'UpdateForm':
-				var _p8 = _p6._1;
-				var _p7 = _p6._0;
-				switch (_p7.ctor) {
+				var _p15 = _p13._1;
+				var _p14 = _p13._0;
+				switch (_p14.ctor) {
 					case 'EmployeesName':
 						return {
 							ctor: '_Tuple2',
-							_0: A2(_thereisno$repository$Main$updateSearchBox, _p8, model),
+							_0: A2(
+								_thereisno$repository$Main$updateDropDown,
+								_elm_lang$core$String$isEmpty(model.employeesName),
+								A2(_thereisno$repository$Main$updateSearchBox, _p15, model)),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'CostomersPhoneOrEmail':
@@ -10790,7 +10821,7 @@ var _thereisno$repository$Main$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{customerEmailOrPhone: _p8}),
+								{customerEmailOrPhone: _p15}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					default:
@@ -10798,7 +10829,7 @@ var _thereisno$repository$Main$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{customerName: _p8}),
+								{customerName: _p15}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 				}
@@ -10806,7 +10837,10 @@ var _thereisno$repository$Main$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: _thereisno$repository$Main$updateTakeSuggestion(
-						A2(_thereisno$repository$Main$updateDropDown, _p6._0, model)),
+						A2(
+							_thereisno$repository$Main$updateDropDown,
+							_elm_lang$core$String$isEmpty(model.employeesName) && _p13._0,
+							model)),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'SuggestEmployee':
@@ -10814,7 +10848,7 @@ var _thereisno$repository$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{employeeSuggestion: _p6._0}),
+						{employeeSuggestion: _p13._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'TakeSuggestion':
@@ -10834,7 +10868,15 @@ var _thereisno$repository$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							employeeSuggestion: _thereisno$repository$Main$findPreviousSuggestion(model)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _thereisno$repository$Main$Model = F7(
@@ -11078,9 +11120,9 @@ var _thereisno$repository$Main$SuggestEmployee = function (a) {
 var _thereisno$repository$Main$viewItem = F2(
 	function (suggestedEmployee, employee) {
 		var isMe = function () {
-			var _p9 = suggestedEmployee;
-			if (_p9.ctor === 'Just') {
-				return _elm_lang$core$Native_Utils.eq(_p9._0, employee);
+			var _p16 = suggestedEmployee;
+			if (_p16.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p16._0, employee);
 			} else {
 				return false;
 			}
@@ -11110,9 +11152,9 @@ var _thereisno$repository$Main$viewItem = F2(
 			});
 	});
 var _thereisno$repository$Main$viewDropdown = function (model) {
-	var _p10 = model;
-	var employeesName = _p10.employeesName;
-	var employees = _p10.employees;
+	var _p17 = model;
+	var employeesName = _p17.employeesName;
+	var employees = _p17.employees;
 	var filteredEmployees = A2(_thereisno$repository$Main$employeeFilter, employeesName, employees);
 	return A2(
 		_elm_lang$html$Html$div,
@@ -11169,11 +11211,11 @@ var _thereisno$repository$Main$view = function (model) {
 					_1: {
 						ctor: '::',
 						_0: function () {
-							var _p11 = model.employeeSuggestion;
-							if (_p11.ctor === 'Nothing') {
+							var _p18 = model.employeeSuggestion;
+							if (_p18.ctor === 'Nothing') {
 								return _elm_lang$html$Html_Attributes$placeholder('Employee\'s Name');
 							} else {
-								return _elm_lang$html$Html_Attributes$placeholder(_p11._0.name);
+								return _elm_lang$html$Html_Attributes$placeholder(_p18._0.name);
 							}
 						}(),
 						_1: {
@@ -11281,18 +11323,20 @@ var _thereisno$repository$Main$view = function (model) {
 };
 var _thereisno$repository$Main$NoOp = {ctor: 'NoOp'};
 var _thereisno$repository$Main$handleKeyPress = function (keyCode) {
-	var _p12 = _SwiftsNamesake$proper_keyboard$Keyboard_Key$fromCode(keyCode);
-	switch (_p12.ctor) {
+	var _p19 = _SwiftsNamesake$proper_keyboard$Keyboard_Key$fromCode(keyCode);
+	switch (_p19.ctor) {
 		case 'Enter':
 			return _thereisno$repository$Main$TakeSuggestion;
 		case 'Down':
 			return _thereisno$repository$Main$NextSuggestion;
+		case 'Up':
+			return _thereisno$repository$Main$PreviousSuggestion;
 		default:
 			return _thereisno$repository$Main$NoOp;
 	}
 };
 var _thereisno$repository$Main$subscriptions = function (model) {
-	return _elm_lang$keyboard$Keyboard$downs(_thereisno$repository$Main$handleKeyPress);
+	return model.employeesNameFocused ? _elm_lang$keyboard$Keyboard$downs(_thereisno$repository$Main$handleKeyPress) : _elm_lang$core$Platform_Sub$none;
 };
 var _thereisno$repository$Main$main = _elm_lang$html$Html$program(
 	{init: _thereisno$repository$Main$init, update: _thereisno$repository$Main$update, view: _thereisno$repository$Main$view, subscriptions: _thereisno$repository$Main$subscriptions})();
