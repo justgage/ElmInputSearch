@@ -34,3 +34,4 @@ type Msg
     | TakeSuggestion
     | NextSuggestion
     | PreviousSuggestion
+    | CloseDropDown

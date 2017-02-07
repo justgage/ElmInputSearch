@@ -4,7 +4,6 @@ import Keyboard.Key as Key
 import Keyboard
 import Types exposing (..)
 import Update exposing (update)
-import Selectors exposing (..)
 import View exposing (view)
 import Html exposing (program)
 
@@ -94,6 +93,7 @@ init =
 -- SUBSCRIPTIONS
 
 
+handleKeyPress : Int -> Msg
 handleKeyPress keyCode =
     case (Key.fromCode keyCode) of
         Key.Enter ->
@@ -104,6 +104,11 @@ handleKeyPress keyCode =
 
         Key.Up ->
             PreviousSuggestion
+
+        -- Esc
+        Key.Unknown 27 ->
+            CloseDropDown
+            
 
         _ ->
             NoOp

@@ -43,6 +43,11 @@ update msg model =
 
         PreviousSuggestion ->
             ( { model | employeeSuggestion = (findPreviousSuggestion model) }, Cmd.none )
+        CloseDropDown ->
+            ( { model | employeeSuggestion = Nothing, employeesNameFocused = False}
+            , Cmd.none
+            )
+
 
 
 updateSearchBox value model =
